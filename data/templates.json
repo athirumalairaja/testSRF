@@ -1,0 +1,14 @@
+{
+    "linux": [
+        {"value": "Rocky-8-20250210", "display": "Rocky-8"},
+        {"value": "Rocky-9-20250305", "display": "Rocky-9"},
+        {"value": "RHEL-8-20250210", "display": "RHEL-8"},
+        {"value": "RHEL-9-20250324", "display": "RHEL-9"},
+        {"value": "Oracle-8-20250210", "display": "Oracle-8"},
+        {"value": "Oracle-9-20250210", "display": "Oracle-9"}
+    ],
+    "windows": [
+        {"value": "Windows-2019-20250210", "display": "Windows 2019"},
+        {"value": "Windows-2022-20250210", "display": "Windows 2022"}
+    ]
+}
