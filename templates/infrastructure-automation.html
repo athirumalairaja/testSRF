@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infrastructure Automation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .header {
+            background-color: #004085;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .header .logo {
+            position: absolute;
+            top: 50%; /* Center vertically */
+            right: 20px; /* Position near the right edge */
+            transform: translateY(-50%);
+            width: 120px; /* Adjust the size of the logo */
+            height: auto; /* Keep proportions */
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #004085;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .option {
+            background-color: #0069d9;
+            color: white;
+            text-align: left;
+            padding: 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: #0056b3;
+        }
+
+        .option:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            display: block;
+            text-align: center;
+        }
+
+        .option h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .option p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #f8f9fa;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 10px 0;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #0056b3;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Infrastructure Automation</h1>
+        <img class="logo" src="{{ url_for('static', filename='Comcast-Logo.wine.svg') }}" alt="Comcast Logo">
+    </div>
+    <div class="container">
+        <div class="section-title">Explore Our Automated Processes</div>
+        <div class="options">
+            <a href="/infra-auto/srf" class="option">
+                <div class="option-icon">&#128736;</div>
+                <h3>VM Deployment</h3>
+                <p>Streamlined automation process for provisioning both Linux and Windows VMs in an on-premises vSphere environment.</p>
+            </a>
+            <a href="/infra-auto/vm-decommission" class="option">
+                <div class="option-icon">&#128465;</div>
+                <h3>VM Decommission</h3>
+                <p>Automated process for securely decommissioning virtual machines in the on-premises vSphere environment.</p>
+            </a>
+            <a href="#" class="option">
+                <div class="option-icon">&#128187;</div>
+                <h3>XG Build</h3>
+                <p>Automated process for provisioning XG clusters, including database servers and Data Guard servers, in the on-premises environment.</p>
+            </a>
+            <a href="#" class="option">
+                <div class="option-icon">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg" alt="Kubernetes Logo" style="width: 40px; height: 40px;">
+                </div>
+                <h3>K8 Deployment</h3>
+                <p>Automated process for provisioning Kubernetes clusters with Kubernetes pre-installed in the on-premises environment.</p>
+            </a>
+            <a href="/infra-auto/security_software_install" class="option">
+                <div class="option-icon">&#128295;</div>
+                <h3>Software Install & Security Patching</h3>
+                <p>Automated process for deploying corporate software such as Tanium, Crowdstrike, and Cada upgrades. Includes security patching workflows.</p>
+            </a>
+        </div>
+    </div>
+    <footer>
+        &copy; 2025 Infrastructure Automation | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a> | <a href="https://github.com/orgs/comcast-efv-observability/projects/19/views/6"> Bugs </a>
+    </footer>
+</body>
+</html>

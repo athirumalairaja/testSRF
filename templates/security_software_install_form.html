@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Deployment Request</title>
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: visible;
+            margin-top: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin: 0 0 24px 0;
+            text-decoration: none;
+            font-size: 26px;
+            font-weight: 600;
+        }
+        label {
+            display: block;
+            margin-top: 16px;
+            color: #555;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        input[type="text"], input[type="number"], input[type="email"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #0078D4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.2);
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            transition: background-color 0.3s ease;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .form-section {
+            margin-bottom: 24px;
+        }
+        .form-section h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .form-section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        /* Custom Select2 Styles */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ddd !important;
+            border-radius: 6px !important;
+            padding: 6px !important;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            min-height: 44px; /* Match input field height */
+            display: flex;
+            align-items: center;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #0078D4 !important;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.2) !important;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #007BFF;
+            border: 1px solid #0056b3;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin: 2px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 4px;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #ffcccc;
+        }
+        .select2-container--default .select2-dropdown {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .select2-container--default .select2-results__option--highlighted {
+            background-color: #007BFF;
+            color: white;
+        }
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Security Software Installation Request Form</h1>
+        <form id="securitySoftwareForm" action="/infra-auto/security_software_install/submit" method="POST">
+            <div class="form-section">
+                <h2>Security Software</h2>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="software" value="tanium"> Tanium</label>
+                    <label><input type="checkbox" name="software" value="crowdstrike"> CrowdStrike</label>
+                    <label><input type="checkbox" name="software" value="OPEN-osquery"> OPEN-osquery</label>
+                    <label><input type="checkbox" name="software" value="eracent"> Eracent</label>
+                    <label><input type="checkbox" name="software" value="cada-client-secure"> Cada Client Secure</label>
+                    <h3>Security Patch</h3>
+                    <label><input type="checkbox" name="security-patch" value="patch"> patch</label>
+                    <label><input type="checkbox" name="security-patch" value="harden"> harden</label>
+                    <label><input type="checkbox" name="security-patch" value="standard"> standard</label>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label for="hostnames" class="required">Add Inventory (Hostnames):</label>
+                <textarea 
+                    id="hostnames" 
+                    name="hostnames" 
+                    placeholder="test-as-1d.sys.comcast.net
+test-as-2d.sys.comcast.net" 
+                    required
+                ></textarea>
+            </div>
+
+            <div class="form-section">
+                <label for="job_slice_count" class="required">Job Slice Count:</label>
+                <input 
+                    type="number" 
+                    id="job_slice_count" 
+                    name="job_slice_count" 
+                    min="1" 
+                    value="1" 
+                    required
+                >
+            </div>
+
+            <div class="form-section">
+                <label for="job_tags">Job Tags:</label>
+                <select id="job_tags" name="job_tags" multiple="multiple">
+                    <option value="remove_default_repos">remove_default_repos</option>
+                    <option value="atlas_global_repo">atlas_global_repo</option>
+                    <option value="aps_custom_repos">aps_custom_repos</option>
+                    <option value="update_packages">update_packages</option>
+                    <option value="clear_yum_cache">clear_yum_cache</option>
+                    <option value="eracent_agent">eracent_agent</option>
+                    <option value="hardware_agents">hardware_agents</option>
+                    <option value="hba_firmware">hba_firmware</option>
+                    <option value="hp_firmware">hp_firmware</option>
+                    <option value="dell_firmware">dell_firmware</option>
+                    <option value="opens">opens</option>
+                    <option value="crowdstrike">crowdstrike</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="skip_tags">Skip Tags:</label>
+                <select id="skip_tags" name="skip_tags" multiple="multiple">
+                    <option value="remove_default_repos">remove_default_repos</option>
+                    <option value="atlas_global_repo">atlas_global_repo</option>
+                    <option value="aps_custom_repos">aps_custom_repos</option>
+                    <option value="update_packages">update_packages</option>
+                    <option value="clear_yum_cache">clear_yum_cache</option>
+                    <option value="eracent_agent">eracent_agent</option>
+                    <option value="hardware_agents">hardware_agents</option>
+                    <option value="hba_firmware">hba_firmware</option>
+                    <option value="hp_firmware">hp_firmware</option>
+                    <option value="dell_firmware">dell_firmware</option>
+                    <option value="opens">opens</option>
+                    <option value="crowdstrike">crowdstrike</option>
+                </select>
+            </div>
+            
+            <div class="form-section">
+            <label for="skip_cada_roles"><input type="checkbox" id="skip_cada_roles" name="skip_cada_roles" value="TRUE"> Skip Cada Roles</label>
+        </div>
+        
+        <div class="form-section">
+            <label for="skip_reboot"><input type="checkbox" id="skip_reboot" name="skip_reboot" value="TRUE"> Skip Reboot</label>
+        </div>
+
+            <label for="email" class="required">Email:</label>
+            <input type="email" id="email" name="email" placeholder="e.g: yourname@example.com" required>
+            
+            <button type="submit">Submit Request</button>
+        </form>
+    </div>
+
+    <!-- Include jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Select2 for Job Tags and Skip Tags
+            $('#job_tags').select2({
+                placeholder: "Select Job Tags",
+                allowClear: true,
+                width: '100%', // Ensure full width
+            });
+        
+            $('#skip_tags').select2({
+                placeholder: "Select Skip Tags",
+                allowClear: true,
+                width: '100%', // Ensure full width
+            });
+        
+            // Get references to all checkboxes
+            const softwareCheckboxes = document.querySelectorAll('input[name="software"]');
+            const patchCheckboxes = document.querySelectorAll('input[name="security-patch"]');
+            const skipCadaRolesCheckbox = document.getElementById('skip_cada_roles');
+            const skipPrePatchRebootCheckbox = document.getElementById('skip_reboot');
+        
+            // Function to disable patch checkboxes
+            function disablePatchCheckboxes() {
+                patchCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = true;
+                });
+            }
+        
+            // Function to disable software checkboxes
+            function disableSoftwareCheckboxes() {
+                softwareCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = true;
+                });
+            }
+        
+            // Function to enable all checkboxes
+            function enableAllCheckboxes() {
+                softwareCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+                patchCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+            }
+        
+            // Add event listeners to software checkboxes
+            softwareCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        disablePatchCheckboxes();
+                    } else {
+                        // If no software checkbox is checked, enable all checkboxes
+                        const isAnySoftwareChecked = Array.from(softwareCheckboxes).some(cb => cb.checked);
+                        if (!isAnySoftwareChecked) {
+                            enableAllCheckboxes();
+                        }
+                    }
+                });
+            });
+        
+            // Add event listeners to patch checkboxes
+            patchCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        disableSoftwareCheckboxes();
+                    } else {
+                        // If no patch checkbox is checked, enable all checkboxes
+                        const isAnyPatchChecked = Array.from(patchCheckboxes).some(cb => cb.checked);
+                        if (!isAnyPatchChecked) {
+                            enableAllCheckboxes();
+                        }
+                    }
+                });
+            });
+        
+            // Form submission validation
+            document.getElementById('securitySoftwareForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+        
+                // Validate at least one checkbox is checked
+                const softwareCheckboxesChecked = document.querySelectorAll('input[name="software"]:checked');
+                const patchCheckboxesChecked = document.querySelectorAll('input[name="security-patch"]:checked');
+                const allCheckedCheckboxes = [...softwareCheckboxesChecked, ...patchCheckboxesChecked];
+        
+                if (allCheckedCheckboxes.length === 0) {
+                    alert("Please select at least one security software or security patch.");
+                    return;
+                }
+        
+                // Validate hostnames
+                const hostnames = document.getElementById('hostnames').value.trim();
+                if (!hostnames) {
+                    alert("Please enter at least one hostname.");
+                    return;
+                }
+        
+                const hostnameList = hostnames.split('\n').map(host => host.trim()).filter(host => host.length > 0);
+                if (hostnameList.length === 0) {
+                    alert("Please enter at least one valid hostname.");
+                    return;
+                }
+        
+                const hostnamePattern = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                for (const hostname of hostnameList) {
+                    if (!hostnamePattern.test(hostname)) {
+                        alert(`Invalid hostname format: ${hostname}`);
+                        return;
+                    }
+                }
+        
+                // Validate job slice count
+                const jobSliceCount = document.getElementById('job_slice_count').value.trim();
+                if (!jobSliceCount || isNaN(jobSliceCount) || jobSliceCount < 1) {
+                    alert("Please enter a valid job slice count.");
+                    return;
+                }
+        
+                // Validate email
+                const email = document.getElementById('email').value.trim();
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailPattern.test(email)) {
+                    alert("Please enter a valid email address.");
+                    return;
+                }
+        
+                // Capture values of the new checkboxes
+                const skipCadaRoles = skipCadaRolesCheckbox.checked ? "TRUE" : "FALSE";
+                const skipPrePatchReboot = skipPrePatchRebootCheckbox.checked ? "TRUE" : "FALSE";
+        
+                // Log or send these values (for demonstration purposes)
+                console.log("Skip Cada Roles:", skipCadaRoles);
+                console.log("Skip Pre-Patch Reboot:", skipPrePatchReboot);
+        
+                // If validation passes, submit the form
+                this.submit();
+                this.reset();
+            });
+        });
+    </script>
+</body>
+</html>

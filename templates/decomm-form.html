@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Decommission</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafc;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eaeaea;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8em;
+            color: #0078D4; /* Corporate blue */
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .required-info {
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            font-size: 0.9em;
+            color: #0078D4;
+            cursor: pointer;
+        }
+
+        .tooltip {
+            display: none;
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 0.85em;
+            width: 300px;
+            z-index: 10;
+        }
+
+        .tooltip:before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent transparent #ddd transparent;
+        }
+
+        .tooltip:after {
+            content: "";
+            position: absolute;
+            top: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 7px;
+            border-style: solid;
+            border-color: transparent transparent #ffffff transparent;
+        }
+
+        .required-info:hover .tooltip,
+        .required-info:focus-within .tooltip {
+            display: block;
+        }
+
+        .info-icon {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 16px;
+            height: 16px;
+            background-color: #0078D4;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            margin-left: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .required {
+            color: #d9534f;
+            margin-left: 5px;
+            font-size: 1em;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #0078D4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.2);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white;
+            background-color: #0078D4;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease-in-out;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #005bb5;
+        }
+
+        button[type="submit"]:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VM Decommission</h1>
+        <form id="decommissionForm" action="/infra-auto/vm-decommission/submit" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="vm_name">
+                    VM Names
+                    <span class="required-info" tabindex="0">
+                        <span class="required">*</span>
+                        <span class="info-icon">?</span>
+                        <span class="tooltip">Enter VM names separated by commas, e.g., vmname1, vmname2, vmname3.</span>
+                    </span>
+                </label>
+                <input type="text" id="vm_name" name="vm_name" placeholder="e.g: vmname1, vmname2, vmname3" required>
+            </div>
+            <div class="form-group">
+                <label for="email">
+                    Email Address
+                    <span class="required-info" tabindex="0">
+                        <span class="required">*</span>
+                        <span class="info-icon">?</span>
+                        <span class="tooltip">Enter your email address for confirmation and updates.</span>
+                    </span>
+                </label>
+                <input type="email" id="email" name="email" placeholder="e.g: yourname@example.com" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('decommissionForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const vmNames = document.getElementById('vm_name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const validVMPattern = /^[a-zA-Z0-9\-_]+$/;  // To validate the VM name pattern
+                const vmNamesArray = vmNames.split(',').map(name => name.trim());
+                
+                // Validate VM names
+                if (!vmNames || vmNamesArray.some(name => !validVMPattern.test(name))) {
+                    alert("Please enter valid VM names, separated by commas.");
+                    return;
+                }
+
+                // Validate email
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailPattern.test(email)) {
+                    alert("Please enter a valid email address.");
+                    return;
+                }
+                
+                const formattedVMName = `vm_name: [${vmNamesArray.join(', ')}]`;
+                document.getElementById('vm_name').value = formattedVMName;
+                
+                // If validation passes, submit the form
+                this.submit();
+        
+                // Clear the form after submission
+                this.reset();
+            });
+        });
+    </script>
+</body>
+</html>

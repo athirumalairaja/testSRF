@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VM Deployment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 50px;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #0078D4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"], input[type="email"] {
+            width: 97%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #0078D4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.2);
+        }
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Server Request Form</h1>
+        <form id="serverRequestForm" action="/infra-auto/srf/submit" method="POST" enctype="multipart/form-data">
+    
+            <label for="server_location" class="required">Server location:</label>
+            <select id="server_location" name="server_location" required onchange="loadVcenters()">
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+            
+            <label for="vcenter" class="required">vCenter:</label>
+            <select id="vcenter" name="vcenter" required onchange="loadDatacenters()">
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+    
+            <label for="datacenter" class="required">Data Center:</label>
+            <select id="datacenter" name="datacenter" required onchange="loadClusters()">
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+    
+            <label for="cluster" class="required">vSphere Cluster:</label>
+            <select id="cluster" name="cluster" required onchange="loadDatastores()">
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+    
+            <label for="datastore" class="required">Data Store:</label>
+            <select id="datastore" name="datastore" required onchange="loadNetworks()">
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+    
+            <label for="location_network" class="required">Location Network:</label>
+            <select id="location_network" name="location_network" required>
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+    
+            <label for="server_os" class="required">Server OS:</label>
+            <select id="server_os" name="server_os" required onchange="updateTemplate()">
+                <option value="">Select</option>
+                <option value="linux">Linux</option>
+                <option value="windows">Windows</option>
+            </select>
+
+            <label for="vsphere_template" class="required">Template Name:</label>
+            <select id="vsphere_template" name="vsphere_template" required>
+                <option value="">Select</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+
+            <label for="static_ip" class="required">Static IP:</label>
+            <select id="static_ip" name="static_ip" required>
+                <option value="">Select</option>
+                <option value="true">true</option>
+                <option value="false">false</option>
+            </select>
+    
+            <label for="ip_address">IP Address:</label>
+            <input type="text" id="ip_address" name="ip_address" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" title="Enter a valid IP address (e.g., 127.0.0.1)">
+    
+            <label for="vm_name" class="required">Vm Name:</label>
+            <input type="text" id="vm_name" name="vm_name" oninput="convertVmName()">
+    
+            <label for="vm_size" class="required">VM Size:</label>
+            <select id="vm_size" name="vm_size" required>
+                <option value="">Select</option>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+            </select>
+    
+            <label for="vm_cpus" class="required">CPU Count:</label>
+            <input type="text" id="vm_cpus" name="vm_cpus" readonly>
+    
+            <label for="vm_memory" class="required">Memory (GB):</label>
+            <input type="text" id="vm_memory" name="vm_memory" readonly>
+    
+            <label for="vm_folder">Folder (Optional):</label>
+            <input type="text" id="vm_folder" name="vm_folder">
+    
+            <label for="AD_remarks">AD Remarks:</label>
+            <input type="text" id="AD_remarks" name="AD_remarks">
+    
+            <label for="additional_disk_sizes">Additional Disk Size(GB):</label>
+            <input type="text" id="additional_disk_sizes" name="additional_disk_sizes">
+    
+            <label for="cada_hostgroups">Cada Hostgroups:</label>
+            <input type="text" id="cada_hostgroups" name="cada_hostgroups" placeholder="Mention Multiple Hostgroup example: 1st_hostgroup, 2nd_hostgroup, etc...">
+    
+            <label for="server_type" class="required">Server Type:</label>
+            <select id="server_type" name="server_type" required>
+                <option value="">Select</option>
+                <option value="app">App_Server</option>
+                <option value="web">Web_Server</option>
+                <option value="gateway">Gateway</option>
+                <option value="storage">Storage</option>
+                <option value="db">DB_Server</option>
+            </select>
+    
+            <label for="server_env" class="required">Server Environment:</label>
+            <select id="server_env" name="server_env" required>
+                <option value="">Select</option>
+                <option value="production">Prod</option>
+                <option value="qa">QA</option>
+                <option value="development">Dev</option>
+                <option value="staging">Stage</option>
+                <option value="training">Training</option>
+            </select>
+    
+            <label for="devhub_app_id" class="required">DevHub App ID:</label>
+            <input type="text" id="devhub_app_id" name="devhub_app_id" placeholder="Devhub App ID (eg:101542)" required>
+    
+            <label for="devhub_app_name" class="required">DevHub App Name:</label>
+            <input type="text" id="devhub_app_name" name="devhub_app_name" placeholder="Devhub App Name (eg: EFV - AWX)" required>
+            
+            <label for="email" class="required">Email:</label>
+            <input type="email" id="email" name="email" placeholder="e.g: yourname@example.com" required>
+    
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+<script>
+    // Load locations when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/infra-auto/api/locations')
+            .then(response => response.json())
+            .then(locations => {
+                const locationSelect = document.getElementById('server_location');
+                locations.forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    option.textContent = location;
+                    locationSelect.appendChild(option);
+                });
+            });
+    });
+
+    // Function to load vCenters based on location
+    function loadVcenters() {
+        const location = document.getElementById('server_location').value;
+        if (!location) return;
+        
+        // Clear downstream selects
+        clearSelect('vcenter');
+        clearSelect('datacenter');
+        clearSelect('cluster');
+        clearSelect('datastore');
+        clearSelect('location_network');
+        
+        fetch(`/infra-auto/api/vcenters/${encodeURIComponent(location)}`)
+            .then(response => response.json())
+            .then(vcenters => {
+                const vcenterSelect = document.getElementById('vcenter');
+                vcenters.forEach(vcenter => {
+                    const option = document.createElement('option');
+                    option.value = vcenter;
+                    option.textContent = vcenter;
+                    vcenterSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Function to load data centers based on vCenter
+    function loadDatacenters() {
+        const vcenter = document.getElementById('vcenter').value;
+        if (!vcenter) return;
+        
+        // Clear downstream selects
+        clearSelect('datacenter');
+        clearSelect('cluster');
+        clearSelect('datastore');
+        clearSelect('location_network');
+        
+        fetch(`/infra-auto/api/datacenters/${encodeURIComponent(vcenter)}`)
+            .then(response => response.json())
+            .then(datacenters => {
+                const datacenterSelect = document.getElementById('datacenter');
+                datacenters.forEach(datacenter => {
+                    const option = document.createElement('option');
+                    option.value = datacenter;
+                    option.textContent = datacenter;
+                    datacenterSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Function to load clusters based on data center
+    function loadClusters() {
+        const datacenter = document.getElementById('datacenter').value;
+        if (!datacenter) return;
+        
+        // Clear downstream selects
+        clearSelect('cluster');
+        clearSelect('datastore');
+        clearSelect('location_network');
+        
+        fetch(`/infra-auto/api/clusters/${encodeURIComponent(datacenter)}`)
+            .then(response => response.json())
+            .then(clusters => {
+                const clusterSelect = document.getElementById('cluster');
+                clusters.forEach(cluster => {
+                    const option = document.createElement('option');
+                    option.value = cluster;
+                    option.textContent = cluster;
+                    clusterSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Function to load datastores based on cluster
+    function loadDatastores() {
+        const cluster = document.getElementById('cluster').value;
+        if (!cluster) return;
+        
+        // Clear downstream selects
+        clearSelect('datastore');
+        clearSelect('location_network');
+        
+        fetch(`/infra-auto/api/datastores/${encodeURIComponent(cluster)}`)
+            .then(response => response.json())
+            .then(datastores => {
+                const datastoreSelect = document.getElementById('datastore');
+                datastores.forEach(datastore => {
+                    const option = document.createElement('option');
+                    option.value = datastore;
+                    option.textContent = datastore;
+                    datastoreSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Function to load networks based on datastore
+    function loadNetworks() {
+        const datastore = document.getElementById('datastore').value;
+        if (!datastore) return;
+        
+        clearSelect('location_network');
+        
+        fetch(`/infra-auto/api/networks/${encodeURIComponent(datastore)}`)
+            .then(response => response.json())
+            .then(networks => {
+                const networkSelect = document.getElementById('location_network');
+                networks.forEach(network => {
+                    const option = document.createElement('option');
+                    option.value = network.value;
+                    option.textContent = network.display;
+                    networkSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Function to clear a select element
+    function clearSelect(selectId) {
+        const select = document.getElementById(selectId);
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+        select.value = '';
+    }
+
+    // Update template options based on OS selection
+    function updateTemplate() {
+        const serverOS = document.getElementById('server_os').value;
+        if (!serverOS) return;
+        
+        fetch(`/infra-auto/api/templates/${serverOS.toLowerCase()}`)
+            .then(response => response.json())
+            .then(templates => {
+                const templateSelect = document.getElementById('vsphere_template');
+                // Clear existing options except the first one
+                while (templateSelect.options.length > 1) {
+                    templateSelect.remove(1);
+                }
+                
+                // Add new options
+                templates.forEach(template => {
+                    const option = document.createElement('option');
+                    option.value = template.value;
+                    option.textContent = template.display;
+                    templateSelect.appendChild(option);
+                });
+            });
+
+        // Disable/Enable CADA Hostgroups based on OS selection
+        const cadaHostgroupsField = document.getElementById('cada_hostgroups');
+        const AD_remarks = document.getElementById('AD_remarks');
+        
+        const osType = serverOS.toLowerCase();
+
+        if (osType === "windows") {
+            cadaHostgroupsField.disabled = true;
+            cadaHostgroupsField.value = '';
+            AD_remarks.disabled = false;
+        } else if (osType === "linux") {
+            cadaHostgroupsField.disabled = false;
+            AD_remarks.disabled = true;
+            AD_remarks.value = '';
+        }
+    }
+
+    // Rest of your existing JavaScript functions remain the same
+    document.getElementById('static_ip').addEventListener('change', function() {
+        var staticIP = this.value;
+        var ipAddressField = document.getElementById('ip_address');
+
+        if (staticIP === 'true') {
+            ipAddressField.required = true;
+            ipAddressField.disabled = false;
+        } else {
+            ipAddressField.required = false;
+            ipAddressField.disabled = true;
+            ipAddressField.value = '';
+        }
+    });
+
+    document.getElementById('vm_size').addEventListener('change', function() {
+        var vmSize = this.value;
+        var cpuCountField = document.getElementById('vm_cpus');
+        var memoryField = document.getElementById('vm_memory');
+
+        if (vmSize === 'small') {
+            cpuCountField.value = 2;
+            memoryField.value = 6;
+        } else if (vmSize === 'medium') {
+            cpuCountField.value = 4;
+            memoryField.value = 8;
+        } else if (vmSize === 'large') {
+            cpuCountField.value = 8;
+            memoryField.value = 16;
+        } else {
+            cpuCountField.value = '';
+            memoryField.value = '';
+        }
+    });
+
+    function convertVmName() {
+        var serverOSField = document.getElementById('server_os').value;
+        var vmNameField = document.getElementById('vm_name');
+
+        if (serverOSField === "windows") {
+            vmNameField.value = vmNameField.value.toUpperCase();
+        } else if (serverOSField === "linux") {
+            vmNameField.value = vmNameField.value.toLowerCase();
+        }
+    };
+
+    document.getElementById('SubmitForm').addEventListener('submit', function(event) {
+        var templateName = document.getElementById('vsphere_template').value;
+        var locationNetwork = document.getElementById('location_network').value;
+        var staticIP = document.getElementById('static_ip').value;
+        var ipAddress = document.getElementById('ip_address').value;
+        var vmSize = document.getElementById('vm_size').value;
+        var memoryField = document.getElementById('vm_memory');
+        var adRemarks = document.getElementById('AD_remarks').value;
+        var vmName = document.getElementById('vm_name').value;
+        var additional_disk_sizes = document.getElementById('additional_disk_sizes').value;
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simplified event listener for form submission
+        document.getElementById('SubmitForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent form submission
+        
+            // Gather all form data
+            const formData = {
+                vsphere_template: document.getElementById('vsphere_template').value,
+                location_network: document.getElementById('location_network').value,
+                static_ip: document.getElementById('static_ip').value,
+                ip_address: document.getElementById('ip_address').value,
+                vm_name: document.getElementById('vm_name').value,
+                vm_cpus: document.getElementById('vm_cpus').value,
+                vm_memory: document.getElementById('vm_memory').value,
+                vm_folder: document.getElementById('vm_folder').value,
+                additional_disk_sizes: document.getElementById('additional_disk_sizes').value,
+                AD_remarks: document.getElementById('AD_remarks').value,
+                cada_hostgroups: document.getElementById('cada_hostgroups').value,
+                server_os: document.getElementById('server_os').value,
+                server_type: document.getElementById('server_type').value,
+                server_env: document.getElementById('server_env').value,
+                server_location: document.getElementById('server_location').value,
+                devhub_app_id: document.getElementById('devhub_app_id').value,
+                devhub_app_name: document.getElementById('devhub_app_name').value
+            };
+
+            const templateName = formData.vsphere_template;
+            const locationNetwork = formData.location_network;
+            const staticIP = formData.static_ip;
+            const ipAddress = formData.ip_address;
+            const vmSize = document.getElementById('vm_size').value;
+            const vmName = formData.vm_name;
+            const adRemarks = formData.AD_remarks;
+            const server_os = formData.server_os
+
+            if (templateName === '' || locationNetwork === '' || staticIP === '' || vmSize === '' || vmName === '') {
+                alert('Please fill out all required fields.');
+                return;
+            }
+    
+            if (staticIP === 'true' && ipAddress === '') {
+                alert('Please provide an IP address.');
+                return;
+            }
+    
+            const os_Type = server_os.toLowerCase();
+            if (server_os === 'windows' && adRemarks === '') {
+                alert('Please provide AD remarks for Windows templates.');
+                return;
+            }
+
+            // Validate email
+            const email = document.getElementById('email').value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailPattern.test(email)) {
+                    alert("Please enter a valid email address.");
+                    return;
+                }
+        }
+        );
+    });
+</script>
+
+</body>
+</html>

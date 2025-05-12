@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VM Deployment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"], input[type="email"] {
+            width: 97%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #0078D4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.2);
+        }
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Server Request Form</h1>
+    <form id="SubmitForm" action="/infra-auto/srf/submit" method="POST" enctype="multipart/form-data">
+        <label for="server_os" class="required">Server OS:</label>
+        <select id="server_os" name="server_os" required onchange="updateTemplate()">
+            <option value="">Select</option>
+            <option value="linux">Linux</option>
+            <option value="windows">Windows</option>
+        </select>
+
+        <label for="server_location" class="required">Server location:</label>
+        <select id="server_location" name="server_location" required onchange="updateLocationNetwork()">
+            <option value="">Select</option>
+            <option value="Ashburn">Ashburn</option>
+            <option value="Hillsboro">Hillsboro</option>
+        </select>
+        
+        <label for="vsphere_template" class="required">Template Name:</label>
+        <select id="vsphere_template" name="vsphere_template">
+            <option value="">Select</option>
+            <option value="Rocky-8-20250210" class="linux">Rocky-8</option>
+            <option value="Rocky-9-20250305" class="linux">Rocky-9</option>
+            <option value="RHEL-8-20250210" class="linux">RHEL-8</option>
+            <option value="RHEL-9-20250324" class="linux">RHEL-9</option>
+            <option value="Oracle-8-20250210" class="linux">Oracle-8</option>
+            <option value="Oracle-9-20250210" class="linux">Oracle-9</option>
+            <option value="Windows-2019-20250210" class="windows">Windows 2019</option>
+            <option value="Windows-2022-20250210" class="windows">Windows 2022</option>
+        </select>
+
+        <label for="location_network" class="required">Location Network:</label>
+        <select id="location_network" name="location_network" required>
+            <option value="">Select</option>
+            <option value="as-dev-green-v71-vm" class="Ashburn">Ashburn Dev Green v71 (10.144.35.3 - 10.144.35.126)</option>
+            <option value="as-dev-green-v60-dhcp" class="Ashburn">Ashburn Dev Green v60 Dhcp (10.27.94.84 - 10.27.94.94)</option>
+            <option value="as-Dev-green-v65-k8-Ing" class="Ashburn">Ashburn Dev Green v65 k8 Ing (10.131.6.130 - 10.131.6.254)</option>
+            <option value="as-Dev-green-v65-k8-eng" class="Ashburn">Ashburn Dev Green v65 k8 eng (10.54.194.3 - 10.54.194.126)</option>
+            <option value="as-dev-blue-v70-vm" class="Ashburn">Ashburn Dev Blue v70 (96.97.66.132 - 96.97.66.254)</option>
+            <option value="as-1p-manage-green-v57-prod" class="Ashburn">Ashburn 01p Management Green v57 Prod (10.131.163.4 - 10.131.163.254)</option>
+            <option value="as-1p-work-green-v57-prod" class="Ashburn">Ashburn 01p Workload Green v57 Prod (10.131.163.4 - 10.131.163.254)</option>
+            <option value="as-1p-manage-green-v66-k8-ing" class="Ashburn">Ashburn 01p Management Green v66 k8 Ing (10.112.76.4 - 10.112.76.254)</option>
+            <option value="as-1p-work-green-v66-k8-ing" class="Ashburn">Ashburn 01p Workload Green v66 k8 Ing (10.112.76.4 - 10.112.76.254)</option>
+            <option value="as-1p-manage-green-v67-k8-egr" class="Ashburn">Ashburn 01p Managemnet Green v67 k8 Egr (10.112.77.4 - 10.112.77.254)</option>
+            <option value="as-1p-work-green-v67-k8-egr" class="Ashburn">Ashburn 01p Workload Green v67 k8 Egr (10.112.77.4 - 10.112.77.254)</option>
+            <option value="as-1p-manage-blue-v70-vm1" class="Ashburn">Ashburn 01p Management Blue v70 vm1 (96.114.25.4 - 96.114.25.254)</option>
+            <option value="as-1p-work-blue-v70-vm1" class="Ashburn">Ashburn 01p Workload Blue v70 vm1 (96.114.25.4 - 96.114.25.25)</option>
+            <option value="as-1p-manage-blue-v70-vm2" class="Ashburn">Ashburn 01p Management Blue v70 vm2 (96.115.134.4 - 96.115.134.255)</option>
+            <option value="as-1p-work-blue-v70-vm2" class="Ashburn">Ashburn 01p Workload Blue v70 vm2 (96.115.134.4 - 96.115.134.255)</option>
+            <option value="ho-3p-manage-green-v202-ecp-vm" class="Hillsboro">Hillsboro 03p Management Green v202 Ecp vm (10.112.252.4 - 10.112.252.254)</option>
+            <option value="ho-3p-work-green-v202-ecp-vm" class="Hillsboro">Hillsboro 03p Workload Green v202 Ecp vm (10.112.252.4 - 10.112.252.254)</option>
+            <option value="ho-3p-manage-green-v205-k8-ing" class="Hillsboro">Hillsboro 03p Management Green v205 k8 Ing (10.112.226.1 - 10.112.226.254)</option>
+            <option value="ho-3p-work-green-v205-k8-ing" class="Hillsboro">Hillsboro 03p Workload Green v205 k8 Ing (10.112.226.1 - 10.112.226.254)</option>
+            <option value="ho-3p-manage-green-v206-k8-egr" class="Hillsboro">Hillsboro 03p Management Green v206 k8 Egr (10.112.227.1 - 10.112.227.254)</option>
+            <option value="ho-3p-work-green-v206-k8-egr" class="Hillsboro">Hillsboro 03p Workload Green v206 k8 Egr (10.112.227.1 - 10.112.227.254)</option>
+            <option value="ho-3p-manage-blue-v102-k8-ing" class="Hillsboro">Hillsboro 03p Management Blue v102 k8 Ing (96.97.86.1 - 96.97.86.254)</option>
+            <option value="ho-3p-work-blue-v102-k8-ing" class="Hillsboro">Hillsboro 03p Workload Blue v102 k8 Ing (96.97.86.1 - 96.97.86.254)</option>
+            <option value="ho-3p-manage-blue-v103-k8-egr" class="Hillsboro">Hillsboro 03p Management Blue v103 k8 Egr (96.97.87.1 - 96.97.87.254)</option>
+            <option value="ho-3p-work-blue-v103-k8-egr" class="Hillsboro">Hillsboro 03p Workload Blue v103 k8 Egr (96.97.87.1 - 96.97.87.254)</option>
+            <option value="ho-3p-manage-blue-v104-ecp-vm" class="Hillsboro">Hillsboro 03p Management Blue v104 Ecp vm (96.97.82.132 - 96.97.82.254)</option>
+            <option value="ho-3p-work-blue-v104-ecp-vm" class="Hillsboro">Hillsboro 03p Workload Blue v104 Ecp vm (96.97.82.132 - 96.97.82.254)</option>
+            <option value="as-3p-abg1-green-v51-vm1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm1-1 (10.146.156.132 - 10.146.156.254)</option>
+            <option value="as-3p-abg1-green-v51-vm2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm2-1 (10.60.85.4 - 10.60.85.254)</option>
+            <option value="as-3p-abg1-green-v51-vm3-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm3-1 (10.28.34.4 - 10.28.34.254)</option>
+            <option value="as-3p-abg1-green-v52-eqto1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto1-1 (10.146.156.68 - 10.146.156.127)</option>
+            <option value="as-3p-abg1-green-v52-eqto2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto2-1 (10.146.157.4 - 10.146.157.126)</option>
+            <option value="as-3p-abg1-green-v52-eqto3-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto3-1 (10.144.245.4 - 10.144.245.126)</option>
+            <option value="as-3p-abg1-green-v53-xg1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg1-1 (10.146.208.4 - 10.146.208.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-1 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb1-1 (10.146.159.196 - 10.146.159.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb2-1 (10.144.46.244 - 10.144.46.254)</option>
+            <option value="as-3p-abg1-blue-v55-prod1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod1-1 (96.115.130.164 - 96.115.130.174)</option>
+            <option value="as-3p-abg1-blue-v55-prod2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod2-1 (68.87.126.4 - 68.87.126.62)</option>
+            <option value="as-3p-abg1-green-v51-vm1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm1-2 (10.146.156.132 - 10.146.156.254)</option>
+            <option value="as-3p-abg1-green-v51-vm2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm2-2 (10.60.85.4 - 10.60.85.254)</option>
+            <option value="as-3p-abg1-green-v51-vm3-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm3-2 (10.28.34.4 - 10.28.34.254)</option>
+            <option value="as-3p-abg1-green-v52-eqto1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto1-2 (10.146.156.68 - 10.146.156.127)</option>
+            <option value="as-3p-abg1-green-v52-eqto2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto2-2 (10.146.157.4 - 10.146.157.126)</option>
+            <option value="as-3p-abg1-green-v52-eqto3-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto3-2 (10.144.245.4 - 10.144.245.126)</option>
+            <option value="as-3p-abg1-green-v53-xg1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg1-2 (10.146.208.4 - 10.146.208.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-2 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-2 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb1-2 (10.146.159.196 - 10.146.159.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb2-2 (10.144.46.244 - 10.144.46.254)</option>
+            <option value="as-3p-abg1-blue-v55-prod1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod1-2 (96.115.130.164 - 96.115.130.174)</option>
+            <option value="as-3p-abg1-blue-v55-prod2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod2-2 (68.87.126.4 - 68.87.126.62)</option>
+            <option value="as-3p-abg1-green-v51-vm1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm1-3 (10.146.156.132 - 10.146.156.254)</option>
+            <option value="as-3p-abg1-green-v51-vm2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm2-3 (10.60.85.4 - 10.60.85.254)</option>
+            <option value="as-3p-abg1-green-v51-vm3-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm3-3 (10.28.34.4 - 10.28.34.254)</option>
+            <option value="as-3p-abg1-green-v52-eqto1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto1-3 (10.146.156.68 - 10.146.156.127)</option>
+            <option value="as-3p-abg1-green-v52-eqto2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto2-3 (10.146.157.4 - 10.146.157.126)</option>
+            <option value="as-3p-abg1-green-v52-eqto3-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto3-3 (10.144.245.4 - 10.144.245.126)</option>
+            <option value="as-3p-abg1-green-v53-xg1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg1-3 (10.146.208.4 - 10.146.208.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-3 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-3 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb1-3 (10.146.159.196 - 10.146.159.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb2-3 (10.144.46.244 - 10.144.46.254)</option>
+            <option value="as-3p-abg1-blue-v55-prod1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod1-3 (96.115.130.164 - 96.115.130.174)</option>
+            <option value="as-3p-abg1-blue-v55-prod2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod2-3 (68.87.126.4 - 68.87.126.62)</option>
+            <option value="as-3p-abg1-green-v51-vm1-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm1-4 (10.146.156.132 - 10.146.156.254)</option>
+            <option value="as-3p-abg1-green-v51-vm2-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm2-4 (10.60.85.4 - 10.60.85.254)</option>
+            <option value="as-3p-abg1-green-v51-vm3-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm3-4 (10.28.34.4 - 10.28.34.254)</option>
+            <option value="as-3p-abg1-green-v52-eqto1-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto1-4 (10.146.156.68 - 10.146.156.127)</option>
+            <option value="as-3p-abg1-green-v52-eqto2-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto2-4 (10.146.157.4 - 10.146.157.126)</option>
+            <option value="as-3p-abg1-green-v52-eqto3-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto3-4 (10.144.245.4 - 10.144.245.126)</option>
+            <option value="as-3p-abg1-green-v53-xg1-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg1-4 (10.146.208.4 - 10.146.208.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-4 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-4 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb1-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb1-4 (10.146.159.196 - 10.146.159.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb2-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb2-4 (10.144.46.244 - 10.144.46.254)</option>
+            <option value="as-3p-abg1-blue-v55-prod1-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod1-4 (96.115.130.164 - 96.115.130.174)</option>
+            <option value="as-3p-abg1-blue-v55-prod2-4" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod2-4 (68.87.126.4 - 68.87.126.62)</option>
+            <option value="as-3p-abg1-green-v51-vm1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm1-5 (10.146.156.132 - 10.146.156.254)</option>
+            <option value="as-3p-abg1-green-v51-vm2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm2-5 (10.60.85.4 - 10.60.85.254)</option>
+            <option value="as-3p-abg1-green-v51-vm3-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v51 vm3-5 (10.28.34.4 - 10.28.34.254)</option>
+            <option value="as-3p-abg1-green-v52-eqto1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto1-5 (10.146.156.68 - 10.146.156.127)</option>
+            <option value="as-3p-abg1-green-v52-eqto2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto2-5 (10.146.157.4 - 10.146.157.126)</option>
+            <option value="as-3p-abg1-green-v52-eqto3-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v52 eqto3-5 (10.144.245.4 - 10.144.245.126)</option>
+            <option value="as-3p-abg1-green-v53-xg1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg1-5 (10.146.208.4 - 10.146.208.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-5 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v53-xg2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v53 xg2-5 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb1-5 (10.146.159.196 - 10.146.159.254)</option>
+            <option value="as-3p-abg1-green-v54-xghb2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Green v54 xghb2-5 (10.144.46.244 - 10.144.46.254)</option>
+            <option value="as-3p-abg1-blue-v55-prod1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod1-5 (96.115.130.164 - 96.115.130.174)</option>
+            <option value="as-3p-abg1-blue-v55-prod2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen1 Blue v55 Prod2-5 (68.87.126.4 - 68.87.126.62)</option>
+            <option value="as-3p-abg4-green-v51-vm1" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v51 vm1 (10.146.156.132 - 10.146.156.254)</option>
+            <option value="as-3p-abg4-green-v51-vm2" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v51 vm2 (10.60.85.4 - 10.60.85.254)</option>
+            <option value="as-3p-abg4-green-v51-vm3" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v51 v3 (10.28.34.4 - 10.28.34.254)</option>
+            <option value="as-3p-abg4-green-v52-eqto" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v52 eqto (10.146.156.68 - 10.146.156.127)</option>
+            <option value="as-3p-abg4-green-v53-xg1" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v53 xg1 (10.146.208.4 - 10.146.208.254)</option>
+            <option value="as-3p-abg4-green-v53-xg2" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v53 xg2 (10.60.81.4 - 10.60.81.254)</option>
+            <option value="as-3p-abg4-green-v54-xghb" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Green v54 xghb (10.146.159.196 - 10.146.159.254)</option>
+            <option value="as-3p-abg4-blue-v55-prod" class="Ashburn">Ashburn 03p AshburnBlueGreen4 Blue v55 Prod (96.115.130.164 - 96.115.130.174)</option>
+            <option value="as-3p-abg2-green-v51-vm1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm1-1 (172.27.212.4 - 172.27.212.254)</option>
+            <option value="as-3p-abg2-green-v51-vm2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm2-1 (10.138.172.4 - 10.138.172.254)</option>
+            <option value="as-3p-abg2-green-v51-vm3-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm3-1 (10.131.120.1 - 10.131.121.253)</option>
+            <option value="as-3p-abg2-green-v52-xg1-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg1-1 (10.131.178.4 - 10.131.178.254)</option>
+            <option value="as-3p-abg2-green-v52-xg2-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg2-1 (10.131.4.4 - 10.131.4.254	)</option>
+            <option value="as-3p-abg2-green-v52-xg3-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg3-1 (10.60.84.4 - 10.60.84.254)</option>
+            <option value="as-3p-abg2-green-v53-xghb-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v53 xghb-1 (10.146.5.196 - 10.146.5.254)</option>
+            <option value="as-3p-abg2-blue-v54-prod-1" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Blue v54 Prod-1 (96.99.196.4 - 96.99.196.254)</option>
+            <option value="as-3p-abg2-green-v51-vm1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm1-2 (172.27.212.4 - 172.27.212.254)</option>
+            <option value="as-3p-abg2-green-v51-vm2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm2-2 (10.138.172.4 - 10.138.172.254)</option>
+            <option value="as-3p-abg2-green-v51-vm3-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm3-2 (10.131.120.1 - 10.131.121.253)</option>
+            <option value="as-3p-abg2-green-v52-xg1-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg1-2 (10.131.178.4 - 10.131.178.254)</option>
+            <option value="as-3p-abg2-green-v52-xg2-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg2-2 (10.131.4.4 - 10.131.4.254	)</option>
+            <option value="as-3p-abg2-green-v52-xg3-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg3-2 (10.60.84.4 - 10.60.84.254)</option>
+            <option value="as-3p-abg2-green-v53-xghb-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v53 xghb-2 (10.146.5.196 - 10.146.5.254)</option>
+            <option value="as-3p-abg2-blue-v54-prod-2" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Blue v54 Prod-2 (96.99.196.4 - 96.99.196.254)</option>
+            <option value="as-3p-abg2-green-v51-vm1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm1-3 (172.27.212.4 - 172.27.212.254)</option>
+            <option value="as-3p-abg2-green-v51-vm2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm2-3 (10.138.172.4 - 10.138.172.254)</option>
+            <option value="as-3p-abg2-green-v51-vm3-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm3-3 (10.131.120.1 - 10.131.121.253)</option>
+            <option value="as-3p-abg2-green-v52-xg1-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg1-3 (10.131.178.4 - 10.131.178.254)</option>
+            <option value="as-3p-abg2-green-v52-xg2-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg2-3 (10.131.4.4 - 10.131.4.254	)</option>
+            <option value="as-3p-abg2-green-v52-xg3-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg3-3 (10.60.84.4 - 10.60.84.254)</option>
+            <option value="as-3p-abg2-green-v53-xghb-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v53 xghb-3 (10.146.5.196 - 10.146.5.254)</option>
+            <option value="as-3p-abg2-blue-v54-prod-3" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Blue v54 Prod-3 (96.99.196.4 - 96.99.196.254)</option>
+            <option value="as-3p-abg2-green-v51-vm1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm1-5 (172.27.212.4 - 172.27.212.254)</option>
+            <option value="as-3p-abg2-green-v51-vm2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm2-5 (10.138.172.4 - 10.138.172.254)</option>
+            <option value="as-3p-abg2-green-v51-vm3-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v51 vm3-5 (10.131.120.1 - 10.131.121.253)</option>
+            <option value="as-3p-abg2-green-v52-xg1-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg1-5 (10.131.178.4 - 10.131.178.254)</option>
+            <option value="as-3p-abg2-green-v52-xg2-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg2-5 (10.131.4.4 - 10.131.4.254	)</option>
+            <option value="as-3p-abg2-green-v52-xg3-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v52 xg3-5 (10.60.84.4 - 10.60.84.254)</option>
+            <option value="as-3p-abg2-green-v53-xghb-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Green v53 xghb-5 (10.146.5.196 - 10.146.5.254)</option>
+            <option value="as-3p-abg2-blue-v54-prod-5" class="Ashburn">Ashburn 03p AshburnBlueGreen2 Blue v54 Prod-5 (96.99.196.4 - 96.99.196.254)</option>
+            <option value="as-3p-abg3-green-v51-vm1" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v51 vm1 (172.27.212.4 - 172.27.212.254)</option>
+            <option value="as-3p-abg3-green-v51-vm2" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v51 vm2 (10.138.172.4 - 10.138.172.254)</option>
+            <option value="as-3p-abg3-green-v51-vm3" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v51 vm3 (10.131.120.1 - 10.131.121.253	)</option>
+            <option value="as-3p-abg3-green-v52-xg1" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v52 xg1 (10.131.178.4 - 10.131.178.254)</option>
+            <option value="as-3p-abg3-green-v52-xg2" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v52 xg2 (10.131.4.4 - 10.131.4.254)</option>
+            <option value="as-3p-abg3-green-v52-xg3" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v52 xg3 (10.60.84.4 - 10.60.84.254)</option>
+            <option value="as-3p-abg3-green-v53-xghb1" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v53 xghb1 (10.146.5.196 - 10.146.5.254)</option>
+            <option value="as-3p-abg3-green-v53-xghb2" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Green v53 xghb2 (10.146.5.196 - 10.146.5.255)</option>
+            <option value="as-3p-abg3-blue-v54-prod" class="Ashburn">Ashburn 03p AshburnBlueGreen3 Blue v54 Prod (96.99.196.4 - 96.99.196.254)</option>
+            <option value="ho-2p-hbg1-green-v48-vm2" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Green v48 vm2 (10.131.20.132-10.131.20.191)</option>
+            <option value="ho-2p-hbg1-blue-v54-vm2-1" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Blue v54 vm2-1 (68.87.116.68-68.87.116.127)</option>
+            <option value="ho-2p-hbg1-blue-v54-vm2-2" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Blue v54 vm2-2 (96.113.0.132 - 96.113.0.254)</option>
+            <option value="ho-2p-hbg1-green-v49-hb" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Green v49 hb (10.144.74.196 - 10.144.74.254)</option>
+            <option value="ho-2p-hbg1-blue-v51-vm1" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Blue v51 vm1 (96.113.0.132 - 96.113.0.254)</option>
+            <option value="ho-2p-hbg1-green-v52-vm1-1" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Green v52 vm1-1 (10.131.19.4 - 10.131.19.254)</option>
+            <option value="ho-2p-hbg1-green-v52-vm1-2" class="Hillsboro">Hillsboro 02p HillsboroBlueGreen1 Green v52 vm1-2 (10.112.100.4 - 10.112.100.254)</option>
+            <option value="as-2p-ar1-red-v305-vm1" class="Ashburn">Ashburn 02p AshburnRed1 Red v305 vm1 (165.137.124.4 - 165.137.125.254)</option>
+            <option value="ho-1p-hbg3-blue-v102-vm1" class="Hillsboro">Hillsboro 01p HillsboroBlueGreen3 Blue v102 vm1 (96.97.80.132 - 96.97.80.254)</option>
+            <option value="ho-1p-hbg3-green-v205-vm1" class="Hillsboro">Hillsboro 01p HillsboroBlueGreen3 Green v205 vm1 (100.93.156.4 - 100.93.157.254)</option>
+            <option value="ho-1p-hbr1-red-v305-vm1" class="Hillsboro">Hillsboro 01p HillsboroBlueRed1 Red v305 vm1 (10.17.172.4 - 10.17.172.254	)</option>
+        </select>
+
+        <label for="static_ip" class="required">Static IP:</label>
+        <select id="static_ip" name="static_ip" required>
+            <option value="">Select</option>
+            <option value="true">true</option>
+            <option value="false">false</option>
+        </select>
+
+        <label for="ip_address">IP Address:</label>
+        <input type="text" id="ip_address" name="ip_address" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$" title="Enter a valid IP address (e.g., 127.0.0.1)">
+
+        <label for="vm_name" class="required">Vm Name:</label>
+        <input type="text" id="vm_name" name="vm_name" oninput="convertVmName()">
+
+        <label for="vm_size" class="required">VM Size:</label>
+        <select id="vm_size" name="vm_size" required>
+            <option value="">Select</option>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+        </select>
+
+        <label for="vm_cpus" class="required">CPU Count:</label>
+        <input type="text" id="vm_cpus" name="vm_cpus" readonly>
+
+        <label for="vm_memory" class="required">Memory (GB):</label>
+        <input type="text" id="vm_memory" name="vm_memory" readonly>
+
+        <label for="vm_folder">Folder (Optional):</label>
+        <input type="text" id="vm_folder" name="vm_folder">
+
+        <label for="AD_remarks">AD Remarks:</label>
+        <input type="text" id="AD_remarks" name="AD_remarks">
+
+        <label for="additional_disk_sizes">Additional Disk Size(GB):</label>
+        <input type="text" id="additional_disk_sizes" name="additional_disk_sizes">
+
+        <label for="cada_hostgroups">Cada Hostgroups:</label>
+        <input type="text" id="cada_hostgroups" name="cada_hostgroups" placeholder="Mention Multiple Hostgroup example: 1st_hostgroup, 2nd_hostgroup, etc...">
+
+        <label for="server_type" class="required">Server Type:</label>
+        <select id="server_type" name="server_type" required>
+            <option value="">Select</option>
+            <option value="app">App_Server</option>
+            <option value="web">Web_Server</option>
+            <option value="gateway">Gateway</option>
+            <option value="storage">Storage</option>
+            <option value="db">DB_Server</option>
+        </select>
+
+        <label for="server_env" class="required">Server Environment:</label>
+        <select id="server_env" name="server_env" required>
+            <option value="">Select</option>
+            <option value="production">Prod</option>
+            <option value="qa">QA</option>
+            <option value="development">Dev</option>
+            <option value="staging">Stage</option>
+            <option value="training">Training</option>
+        </select>
+
+        <label for="devhub_app_id" class="required">DevHub App ID:</label>
+        <input type="text" id="devhub_app_id" name="devhub_app_id" placeholder="Devhub App ID (eg:101542)" required>
+
+        <label for="devhub_app_name" class="required">DevHub App Name:</label>
+        <input type="text" id="devhub_app_name" name="devhub_app_name" placeholder="Devhub App Name (eg: EFV - AWX)" required>
+        
+        <label for="email" class="required">Email:</label>
+        <input type="email" id="email" name="email" placeholder="e.g: yourname@example.com" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('static_ip').addEventListener('change', function() {
+        var staticIP = this.value;
+        var ipAddressField = document.getElementById('ip_address');
+
+        if (staticIP === 'true') {
+            ipAddressField.required = true;
+            ip_address.disabled = false;
+        } else {
+            ipAddressField.required = false;
+            ip_address.disabled = true;
+            ip_address.value = '';
+        }
+    });
+
+    document.getElementById('vm_size').addEventListener('change', function() {
+        var vmSize = this.value;
+        var cpuCountField = document.getElementById('vm_cpus');
+        var memoryField = document.getElementById('vm_memory');
+
+        if (vmSize === 'small') {
+            cpuCountField.value = 2;
+            memoryField.value = 6; // 4 GB
+        } else if (vmSize === 'medium') {
+            cpuCountField.value = 4;
+            memoryField.value = 8; // 16 GB
+        } else if (vmSize === 'large') {
+            cpuCountField.value = 8;
+            memoryField.value = 16; // 64 GB
+        } else {
+            cpuCountField.value = '';
+            memoryField.value = '';
+        }
+    });
+
+    function convertVmName() {
+        var serverOSField = document.getElementById('server_os').value;  // Get the selected OS
+        var vmNameField = document.getElementById('vm_name');  // Get the VM name input field
+
+        if (serverOSField === "windows") {
+            // Automatically convert VM name to uppercase
+            vmNameField.value = vmNameField.value.toUpperCase();
+        } else if (serverOSField === "linux") {
+        // Automatically convert VM name to lowercase for linux
+        vmNameField.value = vmNameField.value.toLowerCase();
+        }
+    };
+
+    function updateTemplate() {
+        var serverOSField = document.getElementById('server_os').value;
+        var templateOptions = document.getElementById("vsphere_template").options;
+        var cadaHostgroupsField = document.getElementById('cada_hostgroups');
+        var AD_remarks = document.getElementById('AD_remarks');
+        var static_ip = document.getElementById('static_ip');
+        var ip_address = document.getElementById('ip_address')
+
+        for (var i = 0; i < templateOptions.length; i++) {
+        var option = templateOptions[i];
+        if (serverOSField === "linux") {
+            option.style.display = option.className === "linux" ? "block" : "none";
+        } else if (serverOSField === "windows") {
+            option.style.display = option.className === "windows" ? "block" : "none";
+        } else {
+            option.style.display = "block";  // Show all if no OS selected
+        }
+    }
+
+    // Disable/Enable CADA Hostgroups based on OS selection
+    if (serverOSField === "windows") {
+        cadaHostgroupsField.disabled = true;  // Disable the field
+        cadaHostgroupsField.value = '';  // Clear the value
+    } else {
+        cadaHostgroupsField.disabled = false;  // Enable the field
+    }
+
+    // Disable/Enable AD Remarks based on OS Selection
+    if (serverOSField === "linux") {
+        AD_remarks.disabled = true;  // Disable the field
+        AD_remarks.value = '';  // Clear the value
+    } else {
+        AD_remarks.disabled = false;  // Enable the field
+    }
+    };
+
+    function updateLocationNetwork() {
+        var server_location = document.getElementById('server_location').value;
+        var location_network = document.getElementById("location_network").options
+
+        for (var i = 0; i < location_network.length; i++) {
+        var option = location_network[i];
+        if (server_location === "Ashburn") {
+            option.style.display = option.className === "Ashburn" ? "block" : "none";
+        } else if (server_location === "Hillsboro") {
+            option.style.display = option.className === "Hillsboro" ? "block" : "none";
+        } else {
+            option.style.display = "block";  // Show all if no Server Location selected
+        }
+    }
+    };
+
+    document.getElementById('serverRequestForm').addEventListener('submit', function(event) {
+        var templateName = document.getElementById('vsphere_template').value;
+        var locationNetwork = document.getElementById('location_network').value;
+        var staticIP = document.getElementById('static_ip').value;
+        var ipAddress = document.getElementById('ip_address').value;
+        var vmSize = document.getElementById('vm_size').value;
+        var memoryField = document.getElementById('vm_memory');
+        var adRemarks = document.getElementById('AD_remarks').value;
+        var vmName = document.getElementById('vm_name').value;
+        var additional_disk_sizes = document.getElementById('additional_disk_sizes').value;
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simplified event listener for form submission
+        document.getElementById('serverRequestForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent form submission
+        
+            // Gather all form data
+            const formData = {
+                vsphere_template: document.getElementById('vsphere_template').value,
+                location_network: document.getElementById('location_network').value,
+                static_ip: document.getElementById('static_ip').value,
+                ip_address: document.getElementById('ip_address').value,
+                vm_name: document.getElementById('vm_name').value,
+                vm_cpus: document.getElementById('vm_cpus').value,
+                vm_memory: document.getElementById('vm_memory').value,
+                vm_folder: document.getElementById('vm_folder').value,
+                additional_disk_sizes: document.getElementById('additional_disk_sizes').value,
+                AD_remarks: document.getElementById('AD_remarks').value,
+                cada_hostgroups: document.getElementById('cada_hostgroups').value,
+                server_os: document.getElementById('server_os').value,
+                server_type: document.getElementById('server_type').value,
+                server_env: document.getElementById('server_env').value,
+                server_location: document.getElementById('server_location').value,
+                devhub_app_id: document.getElementById('devhub_app_id').value,
+                devhub_app_name: document.getElementById('devhub_app_name').value
+            };
+
+            const templateName = formData.vsphere_template;
+            const locationNetwork = formData.location_network;
+            const staticIP = formData.static_ip;
+            const ipAddress = formData.ip_address;
+            const vmSize = document.getElementById('vm_size').value;
+            const vmName = formData.vm_name;
+            const adRemarks = formData.AD_remarks;
+
+            if (templateName === '' || locationNetwork === '' || staticIP === '' || vmSize === '') {
+                alert('Please fill out all required fields.');
+                return;
+            }
+    
+            if (staticIP === 'true' && ipAddress === '') {
+                alert('Please provide an IP address.');
+                return;
+            }
+    
+            var windowsTemplates = ["W2K16_APRIL23", "W2K19_APRIL23", "W2K22_APRIL23"];
+            if (windowsTemplates.includes(templateName)) {
+                if (adRemarks === '') {
+                    alert('Please provide AD remarks for Windows templates.');
+                    return;
+                }
+
+            // Validate email
+            const email = document.getElementById('email').value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!email || !emailPattern.test(email)) {
+                    alert("Please enter a valid email address.");
+                    return;
+                }
+        }
+        });
+    });
+
+</script>
+
+</body>
+</html>
